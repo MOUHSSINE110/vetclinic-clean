@@ -11,3 +11,18 @@
 .primary-btn:hover {
   background-color: #1e40af;
 }
+.primary-btn {
+  background-color: #2563eb; /* Bleu */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.primary-btn:hover {
+  background-color: #1d4ed8; /* Bleu plus foncé au survol */
+}

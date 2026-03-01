@@ -1,41 +1,63 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-
-import Login from "./pages/Login";
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import OwnersList from "./pages/Owners/OwnersList";
-import AnimalsPage from "./pages/Animals/AnimalsPage";
-import ConsultationsPage from "./pages/Consultations/ConsultationsPage";
-import DocumentsPage from "./pages/Documents/DocumentsPage";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ProtectedLayout from "./layouts/ProtectedLayout";
-import AnimalDetails from "./pages/Animals/AnimalDetails";
+import AnimalsPage from './pages/Animals/AnimalsPage';
+import OwnersPage from './pages/Owners/OwnersPage';
+import ConsultationsPage from './pages/Consultations/ConsultationsPage';
+import DocumentsPage from './pages/Documents/DocumentsPage';
+import Sidebar from "./components/Sidebar"; 
 
-<Route path="/animals/:id" element={<AnimalDetails />} />
+// --- ÉTAPE 1 : Vérifiez bien cette ligne ---
+import VetsPage from './pages/VetsPage'; 
+// ---------------------------------------
 
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  if (!token) return <Navigate to="/login" replace />;
+  return children;
+};
 
-export default function App() {
-  console.log("CONSULTATIONS PAGE ACTIVE");
-
+function LayoutWithSidebar({ children }) {
   return (
-    
-    <Routes>
-      {/* Public route */}
-      <Route path="/login" element={<Login />} />
-
-      {/* Protected routes with layout */}
-      <Route element={<ProtectedRoute><ProtectedLayout /></ProtectedRoute>}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/owners" element={<OwnersList />} />
-        <Route path="/animals" element={<AnimalsPage />} />
-        <Route path="/consultations" element={<ConsultationsPage />} />
-        <Route path="/documents" element={<DocumentsPage />} />
-        <Route  path="/animals/:animalId/consultations" element={<ConsultationsPage />} />
-
-      </Route>
-
-      {/* Fallback */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+    <div style={{ display: "flex" }}>
+      <Sidebar /> 
+      <div style={{ 
+        marginLeft: "260px", 
+        flex: 1, 
+        padding: "20px",
+        backgroundColor: "#f3f4f6", 
+        minHeight: "100vh"
+      }}>
+        {children}
+      </div>
+    </div>
   );
 }
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* Routes protégées */}
+        <Route path="/" element={<ProtectedRoute><LayoutWithSidebar><Dashboard /></LayoutWithSidebar></ProtectedRoute>} />
+        <Route path="/owners" element={<ProtectedRoute><LayoutWithSidebar><OwnersPage /></LayoutWithSidebar></ProtectedRoute>} />
+        <Route path="/animals" element={<ProtectedRoute><LayoutWithSidebar><AnimalsPage /></LayoutWithSidebar></ProtectedRoute>} />
+        <Route path="/consultations" element={<ProtectedRoute><LayoutWithSidebar><ConsultationsPage /></LayoutWithSidebar></ProtectedRoute>} />
+        <Route path="/documents" element={<ProtectedRoute><LayoutWithSidebar><DocumentsPage /></LayoutWithSidebar></ProtectedRoute>} />
+        
+        {/* --- ÉTAPE 2 : Ajoutez la route ICI, AVANT la route étoile (*) --- */}
+        <Route path="/vets" element={<ProtectedRoute><LayoutWithSidebar><VetsPage /></LayoutWithSidebar></ProtectedRoute>} />
+        {/* --------------------------------------------------------------- */}
+
+        {/* --- IMPORTANT : La route avec l'étoile (*) DOIT ÊTRE LA DERNIÈRE --- */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* ----------------------------------------------------------------- */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export default App;
